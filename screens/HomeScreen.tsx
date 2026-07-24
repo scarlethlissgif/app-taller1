@@ -2,25 +2,20 @@ import { Button, ImageBackground, StyleSheet, Text, TextInput, View } from 'reac
 import React, { useState } from 'react'
 import { globalStyles } from '../styles/EstilosGlobales'
 import { supabase } from '../supabase/config'
-
+import { useNavigation } from "@react-navigation/native";
 
 
 
 export default function HomeScreen() {
     const [usuario, setusuario] = useState("")
     const [contrasenia, setcontrasenia] = useState("")
+    const navigation = useNavigation<any>();
 
     async function login() {
-        const { error } = await supabase
-            .from('app-taller1')
-            .insert({ usuario: usuario, 
-                contrasenia: contrasenia })
-                
-            //console.log(error) 
 
+    navigation.navigate("Game");
 
-
-    }
+}
 
 
 

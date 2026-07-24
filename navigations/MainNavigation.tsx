@@ -1,10 +1,10 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from '../screens/HomeScreen';
 import GameScreen from '../screens/GameScreen';
-import ScoreScreen from '../screens/ScoreScreen';
 import { NavigationContainer } from '@react-navigation/native';
 
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import ScoreScreen from '../screens/ScoreScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
