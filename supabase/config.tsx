@@ -1,7 +1,10 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from '@supabase/supabase-js'
 
+const url = process.env.EXPO_PUBLIC_SUPABASE_URL
+const key = process.env.EXPO_PUBLIC_SUPABASE_KEY
 
-// Create a single supabase client for interacting with your database
-export const supabase = createClient(
-    'https://xdyumruypxoowhuqaxac.supabase.co',
-     'sb_publishable_bbiUfsn_PMZWSu1nuV3agQ_j3oORbw-')
+if (!url || !key) {
+    throw new Error('Faltan las variables de entorno de Supabase')
+}
+
+export const supabase = createClient(url, key)
