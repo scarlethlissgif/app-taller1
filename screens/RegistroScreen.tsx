@@ -105,42 +105,42 @@ export default function RegistroScreen({ navigation }: any) {
 
 
 
-   async function subirImagen() {
+    async function subirImagen() {
 
-    if (!image) {
-        return "";
+        if (!image) {
+            return "";
+        }
+
+        const avatarFile = await new File(image).bytes();
+
+        const nombreImagen = `${Date.now()}-${nick}.png`;
+
+        const ruta = nombreImagen;
+
+        const { data, error } = await supabase
+            .storage
+            .from("DuckHunt")
+            .upload(ruta, avatarFile, {
+                contentType: "image/jpeg",
+                cacheControl: "no-cache",
+                upsert: false,
+            });
+
+        console.log("DATA:", data);
+        console.log("ERROR:", error);
+
+        if (error) {
+            Alert.alert(
+                "Error",
+                JSON.stringify(error, null, 2)
+            );
+            return "";
+        }
+
+        setRutaFoto(ruta);
+
+        return ruta;
     }
-
-    const avatarFile = await new File(image).bytes();
-
-    const nombreImagen = `${Date.now()}-${nick}.png`;
-
-    const ruta = nombreImagen;
-
-    const { data, error } = await supabase
-        .storage
-        .from("DuckHunt")
-        .upload(ruta, avatarFile, {
-            contentType: "image/jpeg",
-            cacheControl: "no-cache",
-            upsert: false,
-        });
-
-    console.log("DATA:", data);
-    console.log("ERROR:", error);
-
-    if (error) {
-        Alert.alert(
-            "Error",
-            JSON.stringify(error, null, 2)
-        );
-        return "";
-    }
-
-    setRutaFoto(ruta);
-
-    return ruta;
-}
 
 
 

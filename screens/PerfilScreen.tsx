@@ -104,7 +104,7 @@ async function cerrarSesion() {
   }
 
   const resultado = await ImagePicker.launchImageLibraryAsync({
-    mediaTypes: ["images"],
+    mediaTypes: ImagePicker.MediaTypeOptions.Images,
     allowsEditing: true,
     aspect: [1, 1],
     quality: 0.8,
