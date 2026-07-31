@@ -1,106 +1,141 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
-  TouchableOpacity,
+  FlatList,
+  ActivityIndicator,
+  ImageBackground,
 } from "react-native";
+import { useFonts } from "expo-font";
+import { ref, onValue } from "firebase/database";
 
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { globalStyles } from "../styles/EstilosGlobales";
+import { db } from "../firebase/configfire";
+
+
+interface Score {
+  id: string;
+  nombre: string;
+  nick: string;
+  puntaje: number;
+}
 
 export default function ScoreScreen() {
-    
 
-  const navigation = useNavigation<any>();
-  const route = useRoute<any>();
+  const [scores, setScores] = useState<Score[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const score = route.params?.score ?? 0;
-  
+  const [fontsLoaded] = useFonts({
+    Minecraft: require("../assets/fonts/Minecraftia-Regular.ttf"),
+    Pixel: require("../assets/fonts/Pixel Digivolve.otf"),
+  });
+
+  useEffect(() => {
+
+    const referencia = ref(db, "scores");
+
+    const unsubscribe = onValue(referencia, (snapshot) => {
+
+      const datos = snapshot.val();
+
+      if (datos) {
+
+        const lista = Object.keys(datos).map((key) => ({
+          id: key,
+          ...datos[key],
+        }));
+
+        lista.sort((a, b) => b.puntaje - a.puntaje);
+
+        setScores(lista);
+
+      } else {
+
+        setScores([]);
+
+      }
+
+      setLoading(false);
+
+    });
+
+    return () => unsubscribe();
+
+  }, []);
+
+  if (!fontsLoaded || loading) {
+    return (
+      <View style={globalStyles.loading}>
+        <ActivityIndicator size="large" color="#FFD700" />
+      </View>
+    );
+  }
 
   return (
 
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: "#87CEEB",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
+    <ImageBackground
+      source={require("../assets/img/fondoJuego.png")}
+      style={globalStyles.container}
     >
 
-      <Text
-        style={{
-          fontSize: 50,
-          fontWeight: "bold",
-          color: "#2F3542",
-        }}
-      >
-        GAME OVER
+      <Text style={globalStyles.tituloHome}>
+        PUNTAJES
       </Text>
 
-      <Text
-        style={{
-          fontSize: 28,
-          marginTop: 25,
-          color: "#444",
-        }}
-      >
-        PUNTAJE FINAL
-      </Text>
+      <View style={globalStyles.cardRanking}>
 
-      <Text
-        style={{
-          fontSize: 80,
-          fontWeight: "bold",
-          color: "#db2b0c",
-          marginVertical: 25,
-        }}
-      >
-        {score}
-      </Text>
-
-      <TouchableOpacity
-        style={{
-          backgroundColor: "#db2b0c",
-          paddingHorizontal: 40,
-          paddingVertical: 15,
-          borderRadius: 10,
-          marginTop: 15,
-        }}
-        onPress={() => navigation.replace("Game")}
-      >
-        <Text
-          style={{
-            color: "#FFF",
-            fontSize: 22,
-            fontWeight: "bold",
-          }}
-        >
-          TRY AGAIN
+        <Text style={globalStyles.subTitulo}>
+          TOP JUGADORES
         </Text>
-      </TouchableOpacity>
 
-      <TouchableOpacity
-        style={{
-          backgroundColor: "#2F3542",
-          paddingHorizontal: 40,
-          paddingVertical: 15,
-          borderRadius: 10,
-          marginTop: 20,
-        }}
-        onPress={() => navigation.navigate("Home")}
-      >
-        <Text
-          style={{
-            color: "#FFF",
-            fontSize: 22,
-            fontWeight: "bold",
-          }}
-        >
-          HOME
-        </Text>
-      </TouchableOpacity>
+        <FlatList
+          data={scores}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item, index }) => (
 
-    </View>
+            <View style={globalStyles.filaRanking}>
+
+              <Text style={globalStyles.posicion}>
+
+                {index == 0
+                  ? "🥇"
+                  : index == 1
+                  ? "🥈"
+                  : index == 2
+                  ? "🥉"
+                  : `${index + 1}.`}
+
+              </Text>
+
+              <View style={{ flex: 1 }}>
+
+                <Text style={globalStyles.nombreRanking}>
+                  {item.nombre}
+                </Text>
+
+                <Text style={globalStyles.nickRanking}>
+                  @{item.nick}
+                </Text>
+
+              </View>
+
+              <Text style={globalStyles.puntajeRanking}>
+                {item.puntaje}
+              </Text>
+
+            </View>
+
+          )}
+          ListEmptyComponent={
+            <Text style={globalStyles.sinDatos}>
+              Aún no existen puntajes.
+            </Text>
+          }
+        />
+
+      </View>
+
+    </ImageBackground>
 
   );
 
